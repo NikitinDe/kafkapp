@@ -1,0 +1,38 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  application:
+    name: discount
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: Deniska55
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  main:
+      allow-bean-definition-overriding: true
+
+
+
+server:
+  port: 8081
+
+rest:
+  clients:
+      url: http://localhost:8081/api/v1/clients
+
+kafka:
+  topics:
+    sms: Discount
+
+discount: 10%
+
+scheduler:
+   cron:  "0 0 * * * ?"
