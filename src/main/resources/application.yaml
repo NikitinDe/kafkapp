@@ -2,14 +2,19 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        value.serializer: org.apache.kafka.common.serialization.StringSerializer
   application:
     name: discount
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: Deniska55
+    hikari:
+      url: jdbc:postgresql://localhost:5432/postgres
+      username: postgres
+      password: Deniska55
+  initialization-mode: always
+  schema: classpath:database/initDB.sql
+  data: classpath:database/populateDB.sql
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,16 +22,14 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   main:
-      allow-bean-definition-overriding: true
-
-
+    allow-bean-definition-overriding: true
 
 server:
   port: 8081
 
 rest:
   clients:
-      url: http://localhost:8081/api/v1/clients
+      url: http://localhost:8082/api/v1/clients
 
 kafka:
   topics:
