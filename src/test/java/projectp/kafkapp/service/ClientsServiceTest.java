@@ -5,58 +5,32 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.client.RestTemplate;
+import org.mockito.stubbing.OngoingStubbing;
+import org.springframework.kafka.core.KafkaTemplate;
+import projectp.kafkapp.Config.AppConfigProperties;
+import projectp.kafkapp.httpClient.FeignClients;
+import projectp.kafkapp.mapper.MapperConfig;
+import projectp.kafkapp.model.ClientsInfo;
 import projectp.kafkapp.model.ClientsModel;
 import projectp.kafkapp.repository.ClientsRepository;
+import projectp.kafkapp.smsFormat.SmsMessage;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.time.LocalTime;
+import java.time.Month;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static com.jayway.jsonpath.internal.path.PathCompiler.fail;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
-public class ClientsServiceTest {
-
-    @Mock
-    private RestTemplate restTemplate;
-
-    @Mock
-    private ClientsRepository clientRepository;
-
-    @InjectMocks
-    private ClientsService clientsService;
-    private String clientsUrl = "http://localhost:8081/api/v1/clients";
-
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.openMocks(this);
-    }
-
-
-    @Test
-    // Arrange
-    public void fetchClientInfo() {
-        // Arrange
-        ClientsModel[] clients = restTemplate.getForObject(clientsUrl, ClientsModel[].class);
-        System.out.println("Fetched clients: " + Arrays.toString(clients));
-
-        List<ClientsModel> filteredClients = Stream.ofNullable(clients)
-                .flatMap(Arrays::stream)
-                .filter(Objects::nonNull)
-                .filter(client -> Objects.nonNull(client.getPhone()) && client.getPhone().endsWith("7"))
-                .filter(client -> Objects.nonNull(client.getBirthday()) && client.getBirthday().getMonth() == LocalDate.now().getMonth())
-                .collect(Collectors.toList());
-        System.out.println("Filtered clients: " + filteredClients);
-
-        clientRepository.saveAll(filteredClients);
-    }
-
+    public class ClientsServiceTest {
 
 }
-

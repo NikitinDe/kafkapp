@@ -1,9 +1,11 @@
+server:
+  port: 8080
+
+clients:
+   url: localhost:8081
+
 spring:
-  kafka:
-    bootstrap-servers: localhost:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  bootstrap: localhost:9092
   application:
     name: discount
   datasource:
@@ -11,28 +13,27 @@ spring:
     username: postgres
     password: Deniska55
   jpa:
+    open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  main:
-      allow-bean-definition-overriding: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/master.yaml
 
 
+app:
+  config:
+    discount: 10
+    cronExpression: "0 0 * * * ?"
+    sendTime: "19:00"
+    topic-name: messageSMS
+    partitions-num: 1
+    replication-factor: 1
 
-server:
-  port: 8081
 
-rest:
-  clients:
-      url: http://localhost:8081/api/v1/clients
-
-kafka:
-  topics:
-    sms: Discount
-
-discount: 10%
-
-scheduler:
-   cron:  "0 0 * * * ?"
