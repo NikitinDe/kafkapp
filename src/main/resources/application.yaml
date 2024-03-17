@@ -8,10 +8,9 @@ spring:
   application:
     name: discount
   datasource:
-    hikari:
-      url: jdbc:postgresql://localhost:5432/postgres
-      username: postgres
-      password: Deniska55
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: Deniska55
   initialization-mode: always
   schema: classpath:database/initDB.sql
   data: classpath:database/populateDB.sql
@@ -21,6 +20,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+    database: postgresql
+    show-sql: true
   main:
     allow-bean-definition-overriding: true
 

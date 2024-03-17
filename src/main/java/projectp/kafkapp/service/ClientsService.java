@@ -1,5 +1,6 @@
 package projectp.kafkapp.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,17 +16,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
+@RequiredArgsConstructor
 public class ClientsService {
 
     private final RestTemplate restTemplate;
     private final ClientsRepository clientRepository;
 
-    @Autowired
-
-    public ClientsService(RestTemplate restTemplate, ClientsRepository clientRepository) {
-        this.restTemplate = restTemplate;
-        this.clientRepository = clientRepository;
-    }
 
     @Value("${rest.clients.url}")
     private String clientsUrl;

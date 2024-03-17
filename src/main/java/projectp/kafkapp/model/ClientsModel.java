@@ -1,10 +1,9 @@
 package projectp.kafkapp.model;
 
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.annotations.Entity;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
