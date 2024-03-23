@@ -8,7 +8,8 @@ public class SmsMessage {
     private String message;
 
 
-    public SmsMessage(String phone,Object format) {
+    public SmsMessage(String phone, Object format) {
+        this.phone = phone;
 
     }
 }

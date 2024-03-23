@@ -49,7 +49,7 @@ public class ClientsService {
         LocalDateTime endOfDay = LocalDate.now(ZoneId.of("Europe/Moscow")).
                 atTime(sendTime);
 
-        if (LocalDateTime.now(ZoneId.of("Europe/Moscow")).isAfter(endOfDay)) {
+        if (LocalDateTime.now(ZoneId.of("Europe/Moscow")).isBefore(endOfDay)) {
             List<ClientsModel> clientsToSendSMS = clientsRepository.findAll().stream()
                     .filter(client -> !client.isMessageSend())
                     .toList();
@@ -78,7 +78,7 @@ public class ClientsService {
         LocalTime sendTime = appConfigProperties.getSendTime();
         LocalDateTime endOfDay = LocalDate.now(ZoneId.of("Europe/Moscow")).atTime(sendTime);
 
-        if (LocalDateTime.now(ZoneId.of("Europe/Moscow")).isAfter(endOfDay)) {
+        if (LocalDateTime.now(ZoneId.of("Europe/Moscow")).isBefore(endOfDay)) {
             List<ClientsModel> clientsToSendSMS = clientsRepository.findAll().stream()
                     .filter(client -> !client.isMessageSend())
                     .collect(Collectors.toList()); // Используем collect вместо toList

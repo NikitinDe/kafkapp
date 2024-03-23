@@ -18,9 +18,7 @@ public class ClientsModel {
     @Column(name = "full_name")
     private String fullName;
 
-    public String getPhone() {
-        return phone;
-    }
+
 
     @Column(name = "phone")
     private String  phone;
