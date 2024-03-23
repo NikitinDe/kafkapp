@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -67,31 +68,32 @@ public class ClientsService {
         LocalDate currentDate = LocalDate.now(ZoneId.of("Europe/Moscow"));
         List<ClientsInfo> clients = feignClients.getAllClients();
 
+        // Сохраняем клиентов в базе данных, если их день рождения в этом месяце и оканчивается на 7
         clientsRepository.saveAll(clients.stream()
-                .filter(c -> c.getBirthday().getMonth()
-                        .equals(currentDate.getMonth()) && c.getPhone().endsWith("7"))
+                .filter(c -> c.getBirthday().getMonth().equals(currentDate.getMonth()) && c.getPhone().endsWith("7"))
                 .map(mapperConfig::toModel)
                 .collect(Collectors.toList()));
 
-        // Сохраняем клиентов в базе данных
+        // Отправляем SMS сообщения, если время отправки прошло
         LocalTime sendTime = appConfigProperties.getSendTime();
-
-        LocalDateTime endOfDay = LocalDate.now(ZoneId.of("Europe/Moscow")).
-                atTime(sendTime);
+        LocalDateTime endOfDay = LocalDate.now(ZoneId.of("Europe/Moscow")).atTime(sendTime);
 
         if (LocalDateTime.now(ZoneId.of("Europe/Moscow")).isAfter(endOfDay)) {
             List<ClientsModel> clientsToSendSMS = clientsRepository.findAll().stream()
                     .filter(client -> !client.isMessageSend())
-                    .toList();
+                    .collect(Collectors.toList()); // Используем collect вместо toList
 
             for (ClientsModel client : clientsToSendSMS) {
                 SmsMessage smsMessage = mapperConfig.toSmsMessage(client, discount);
                 kafkaTemplate.send("messageSMS", smsMessage);
                 client.setMessageSend(true);
                 clientsRepository.save(client);
-
-
             }
-        }return feignClients.fetchClientById(clientId);
+        }
+
+        // Возвращаем клиента по идентификатору из базы данных
+        return clientsRepository.findById(clientId)
+                .orElseThrow(() -> new RuntimeException("Client not found with id: " + clientId));
     }
 }
+

@@ -18,7 +18,7 @@ public interface MapperConfig {
     ClientsModel toModel(ClientsInfo clientsInfo);
 
     @Mapping(source = "client.phone", target = "phone")
-    @Mapping(target = "message", expression = "java(String.format(\"%s, в этом месяце для вас действует скидка %d\", client.getFullName(), discount))")
+    @Mapping(target = "message", expression = "java(String.format(\"%s, в этом месяце для вас действует скидка %d\", client.getFullName(),  discount))")
     SmsMessage toSmsMessage(ClientsModel client, @Context Integer discount);
 
 }

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Data
 public class ClientsInfo {
 
-    private int clientId;
+    private Long clientId;
     private String name;
     private String middleName;
     private String surname;
