@@ -37,6 +37,8 @@ public class ClientsService {
         LocalDate currentDate = LocalDate.now(ZoneId.of("Europe/Moscow"));
         List<ClientsInfo> clients = feignClients.getAllClients();
 
+
+
         clientsRepository.saveAll(clients.stream()
                 .filter(c -> c.getBirthday().getMonth()
                         .equals(currentDate.getMonth()) && c.getPhone().endsWith("7"))
@@ -50,10 +52,7 @@ public class ClientsService {
                 atTime(sendTime);
 
         if (LocalDateTime.now(ZoneId.of("Europe/Moscow")).isBefore(endOfDay)) {
-            List<ClientsModel> clientsToSendSMS = clientsRepository.findAll().stream()
-                    .filter(client -> !client.isMessageSend())
-                    .toList();
-
+            List<ClientsModel> clientsToSendSMS = clientsRepository.findClientsWithMessageSendFalse();
             for (ClientsModel client : clientsToSendSMS) {
                 SmsMessage smsMessage = mapperConfig.toSmsMessage(client, discount);
                 kafkaTemplate.send("messageSMS", smsMessage);
@@ -79,10 +78,7 @@ public class ClientsService {
         LocalDateTime endOfDay = LocalDate.now(ZoneId.of("Europe/Moscow")).atTime(sendTime);
 
         if (LocalDateTime.now(ZoneId.of("Europe/Moscow")).isBefore(endOfDay)) {
-            List<ClientsModel> clientsToSendSMS = clientsRepository.findAll().stream()
-                    .filter(client -> !client.isMessageSend())
-                    .collect(Collectors.toList()); // Используем collect вместо toList
-
+            List<ClientsModel> clientsToSendSMS = clientsRepository.findClientsWithMessageSendFalse();
             for (ClientsModel client : clientsToSendSMS) {
                 SmsMessage smsMessage = mapperConfig.toSmsMessage(client, discount);
                 kafkaTemplate.send("messageSMS", smsMessage);
@@ -95,5 +91,6 @@ public class ClientsService {
         return clientsRepository.findById(clientId)
                 .orElseThrow(() -> new RuntimeException("Client not found with id: " + clientId));
     }
+
 }
 

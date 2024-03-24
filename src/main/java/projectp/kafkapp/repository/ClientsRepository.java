@@ -11,8 +11,9 @@ import java.util.List;
 
 @Repository
 public interface ClientsRepository extends JpaRepository<ClientsModel, Long> {
-    @Query("SELECT c FROM ClientsModel c WHERE c.phone LIKE CONCAT('%', :endingWith, '%') AND MONTH(c.birthday) = :birthdayMonth")
-    List<ClientsInfo> findByPhoneEndingWithAndBirthdayMonth(@Param("endingWith") String endingWith, @Param("birthdayMonth") int birthdayMonth);
+    @Query("SELECT c FROM ClientsModel c WHERE c.messageSend = false")
+    List<ClientsModel> findClientsWithMessageSendFalse();
+
 
 
 }
