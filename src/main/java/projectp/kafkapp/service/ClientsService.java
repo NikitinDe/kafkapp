@@ -1,10 +1,11 @@
 package projectp.kafkapp.service;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import projectp.kafkapp.Config.AppConfigProperties;
 import projectp.kafkapp.httpClient.FeignClients;
 import projectp.kafkapp.mapper.MapperConfig;
 import projectp.kafkapp.model.ClientsInfo;
@@ -17,7 +18,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -29,27 +29,33 @@ public class ClientsService {
     private final ClientsRepository clientsRepository;
     private final KafkaTemplate<String, SmsMessage> kafkaTemplate;
     private final MapperConfig mapperConfig;
-    private final AppConfigProperties appConfigProperties;
+
+    @Value("${app.config.discount}")
+    private   Integer discount;
+
+    @Value("${app.config.sendTime}")
+    private   LocalTime sendTime;
+
+    @Value("${app.config.zoneId}")
+    private String zoneIdString;
+
+
 
 
     public void processClientsAndSendSMS() {
-        Integer discount = appConfigProperties.getDiscount();
+
         LocalDate currentDate = LocalDate.now(ZoneId.of("Europe/Moscow"));
         List<ClientsInfo> clients = feignClients.getAllClients();
-
-
-
         clientsRepository.saveAll(clients.stream()
-                .filter(c -> c.getBirthday().getMonth()
-                        .equals(currentDate.getMonth()) && c.getPhone().endsWith("7"))
+                .filter(client -> client.getBirthday() != null && client.getBirthday().getMonth().equals(currentDate.getMonth()))
+                .filter(client -> client.getPhone() != null && client.getPhone().endsWith("7"))
                 .map(mapperConfig::toModel)
                 .collect(Collectors.toList()));
-
         // Сохраняем клиентов в базе данных
-        LocalTime sendTime = appConfigProperties.getSendTime();
+
 
         LocalDateTime endOfDay = LocalDate.now(ZoneId.of("Europe/Moscow")).
-                atTime(sendTime);
+                atTime(19,00,0);
 
         if (LocalDateTime.now(ZoneId.of("Europe/Moscow")).isBefore(endOfDay)) {
             List<ClientsModel> clientsToSendSMS = clientsRepository.findClientsWithMessageSendFalse();
@@ -60,24 +66,25 @@ public class ClientsService {
                 clientsRepository.save(client);
             }
         }
+
+
     }
 
     public ClientsModel fetchClientById(Long clientId) {
-        Integer discount = appConfigProperties.getDiscount();
-        LocalDate currentDate = LocalDate.now(ZoneId.of("Europe/Moscow"));
+        LocalDate currentDate = LocalDate.now(ZoneId.of(zoneIdString));
         List<ClientsInfo> clients = feignClients.getAllClients();
 
         // Сохраняем клиентов в базе данных, если их день рождения в этом месяце и оканчивается на 7
         clientsRepository.saveAll(clients.stream()
-                .filter(c -> c.getBirthday().getMonth().equals(currentDate.getMonth()) && c.getPhone().endsWith("7"))
+                .filter(client -> client.getBirthday().getMonth().equals(currentDate.getMonth()) && client.getPhone().endsWith("7"))
                 .map(mapperConfig::toModel)
                 .collect(Collectors.toList()));
 
-        // Отправляем SMS сообщения, если время отправки прошло
-        LocalTime sendTime = appConfigProperties.getSendTime();
-        LocalDateTime endOfDay = LocalDate.now(ZoneId.of("Europe/Moscow")).atTime(sendTime);
+        // Отправляем SMS сообщения, если время отправки пришло
 
-        if (LocalDateTime.now(ZoneId.of("Europe/Moscow")).isBefore(endOfDay)) {
+        LocalDateTime endOfDay = LocalDate.now(ZoneId.of(zoneIdString)).atTime(sendTime);
+
+        if (LocalDateTime.now(ZoneId.of(zoneIdString)).isBefore(endOfDay)) {
             List<ClientsModel> clientsToSendSMS = clientsRepository.findClientsWithMessageSendFalse();
             for (ClientsModel client : clientsToSendSMS) {
                 SmsMessage smsMessage = mapperConfig.toSmsMessage(client, discount);

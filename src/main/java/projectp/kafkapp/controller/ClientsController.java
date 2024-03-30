@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import projectp.kafkapp.model.ClientsModel;
 import projectp.kafkapp.service.ClientsService;
 
-import java.util.Optional;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")

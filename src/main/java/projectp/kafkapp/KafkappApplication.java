@@ -14,7 +14,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @EnableFeignClients
 public class KafkappApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(KafkappApplication.class, args);
     }

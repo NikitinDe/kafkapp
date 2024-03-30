@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class ClientsConfig {
+public class KafkaConfig {
 
     @Value("${spring.bootstrap}")
     private String bootstrapServers;
@@ -32,10 +32,8 @@ public class ClientsConfig {
     @Value("${app.config.replication-factor}")
     private short replicationFactor;
 
-
     @Bean
     public KafkaTemplate<String, SmsMessage> kafkaTemplate() {
-
         return new KafkaTemplate<>(producerFactory());
     }
 
