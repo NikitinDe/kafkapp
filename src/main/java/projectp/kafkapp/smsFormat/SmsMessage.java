@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class SmsMessage {
     private String phone;
     private String message;
+    private String name;
 }
